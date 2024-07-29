@@ -1,0 +1,66 @@
+<%- include('../partials/head') %> <%- include('../partials/header') %>
+
+<main class="container">
+	<div class="mb-3">
+		<label for="exampleFormControlInput1" class="form-label">Name</label>
+		<input
+			type="text"
+			name="name"
+			class="form-control"
+			id="exampleFormControlInput1"
+			placeholder="Name"
+			value="<%= note.name %>"
+			minlength="5"
+		/>
+	</div>
+	<div class="mb-3">
+		<label for="exampleFormControlTextarea1" class="form-label">Content</label>
+		<textarea
+			class="form-control"
+			name="content"
+			id="exampleFormControlTextarea1"
+			rows="7"
+			minlength="5"
+		>
+<%= note.content %></textarea
+		>
+	</div>
+	<div class="mb-3 text-center">
+		<button type="button" class="btn btn-success btnEdit">Edit</button>
+	</div>
+</main>
+<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+<script>
+	$(document).ready(function () {
+		$("button.btnEdit").click(function () {
+			let name = $("#exampleFormControlInput1").val();
+			let content = $("#exampleFormControlTextarea1").val();
+			fetch("/<%= note._id %>", {
+				method: "PUT",
+				headers: {
+					"Content-Type": "application/json",
+					// Include other headers if needed
+				},
+				body: JSON.stringify({
+					name: name,
+					content: content,
+				}),
+			})
+				.then((response) => {
+					if (!response.ok) {
+						throw new Error("Network response was not ok");
+					}
+					return response;
+				})
+				.then((data) => {
+					alert("Item updated successfully!");
+					// Optionally update the row content
+				})
+				.catch((error) => {
+					console.error("There was a problem with the fetch operation:", error);
+					alert("There was a problem updating the item.");
+				});
+		});
+	});
+</script>
+<%- include('../partials/footer') %>

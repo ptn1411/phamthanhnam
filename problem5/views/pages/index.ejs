@@ -1,0 +1,104 @@
+<%- include('../partials/head') %> <%- include('../partials/header') %>
+
+<main class="container">
+	<h1>Note</h1>
+
+	<table id="example" class="stripe row-border order-column" style="width: 100%">
+		<thead>
+			<tr>
+				<th>ID</th>
+				<th>Name</th>
+				<th>Content</th>
+				<th>Date</th>
+				<th></th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+            
+			<% notes.forEach(function(note){ %>
+			<tr>
+				<td><%= note._id %></td>
+				<td><%= note.name %></td>
+				<td><%= note.content %></td>
+				<td><%= note.date %></td>
+				<td>
+					<a class="icon-link" href="/<%= note._id %>"> View </a>
+				</td>
+				<td>
+					<button class="btn btn-danger btnDelete" data-id="<%= note._id %>" type="button"> Delete </a>
+				</td>
+			</tr>
+			<%}); %>
+		</tbody>
+		<tfoot>
+			<tr>
+				<th>ID</th>
+				<th>Name</th>
+				<th>Content</th>
+				<th>Date</th>
+				<th></th>
+				<th></th>
+			</tr>
+		</tfoot>
+	</table>
+</main>
+<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+<script src="https://cdn.datatables.net/2.1.2/js/dataTables.js"></script>
+<script src="https://cdn.datatables.net/fixedcolumns/5.0.1/js/dataTables.fixedColumns.js"></script>
+<script src="https://cdn.datatables.net/fixedcolumns/5.0.1/js/fixedColumns.dataTables.js"></script>
+<script>
+	$(document).ready(function () {
+		// Setup - add a text input to each footer cell
+		$("#example tfoot th").each(function (i) {
+			var title = $("#example thead th").eq($(this).index()).text();
+			$(this).html('<input type="text" placeholder="' + title + '" data-index="' + i + '" />');
+		});
+
+		// DataTable
+		var table = $("#example").DataTable({
+			scrollY: "300px",
+			scrollX: true,
+			scrollCollapse: true,
+			paging: false,
+			fixedColumns: true,
+		});
+
+		// Filter event handler
+		$(table.table().container()).on("keyup", "tfoot input", function () {
+			table.column($(this).data("index")).search(this.value).draw();
+		});
+
+        $("button.btnDelete").click(function(){
+            
+            var id = $(this).data('id');
+            if (confirm("Are you sure you want to delete item with ID: " + id + "?")) {
+            // Perform the DELETE request
+            fetch('/' + id, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    // You may need to include other headers if required by your API
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response
+            })
+            .then(data => {
+                // Handle the response data
+                alert('Item deleted successfully!');
+                // Optionally, you might want to remove the row from the table
+                window.location.reload()
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+                alert('There was a problem deleting the item.');
+            });
+        }
+        });
+	});
+</script>
+<%- include('../partials/footer') %>
